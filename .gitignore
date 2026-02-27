@@ -1,0 +1,12 @@
+## .NET
+bin/
+obj/
+publish/
+*.user
+deploy.zip
+
+## IDE
+.vs/
+*.suo
+*.userosscache
+*.sln.docstates

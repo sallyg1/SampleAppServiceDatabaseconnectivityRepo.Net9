@@ -1,0 +1,6 @@
+@Pima.Api_HostAddress = http://localhost:5166
+
+GET {{Pima.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
