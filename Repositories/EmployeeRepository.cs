@@ -23,4 +23,20 @@ public class EmployeeRepository : IEmployeeRepository
             .Take(count)
             .ToListAsync();
     }
+
+    /// <inheritdoc />
+    public async Task<List<Employee>> GetByDepartmentAsync(string department)
+    {
+        return await _context.Employees
+            .FromSqlInterpolated($"EXEC GetEmployeesByDepartment @Department = {department}")
+            .ToListAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<Employee> AddAsync(Employee employee)
+    {
+        _context.Employees.Add(employee);
+        await _context.SaveChangesAsync();
+        return employee;
+    }
 }

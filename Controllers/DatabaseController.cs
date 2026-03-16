@@ -54,6 +54,29 @@ public class DatabaseController : ControllerBase
         var employees = await _employeeRepo.GetTopAsync(2);
         return Ok(employees);
     }
+
+    /// <summary>
+    /// Returns employees in a given department via stored procedure.
+    /// </summary>
+    [HttpGet("employees/department/{department}")]
+    [ProducesResponseType(typeof(List<Employee>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeesByDepartment(string department)
+    {
+        var employees = await _employeeRepo.GetByDepartmentAsync(department);
+        return Ok(employees);
+    }
+
+    /// <summary>
+    /// Creates a new employee record.
+    /// </summary>
+    [HttpPost("employees")]
+    [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreateEmployee([FromBody] Employee employee)
+    {
+        employee.CreatedAt = DateTime.UtcNow;
+        var created = await _employeeRepo.AddAsync(employee);
+        return CreatedAtAction(nameof(GetEmployees), created);
+    }
 }
 
 /// <summary>

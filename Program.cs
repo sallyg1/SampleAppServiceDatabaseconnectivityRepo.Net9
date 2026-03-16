@@ -13,14 +13,26 @@ builder.Services.AddSwaggerGen();
 
 // Register SecretClient for Azure Key Vault
 var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+SecretClient? secretClient = null;
 if (!string.IsNullOrEmpty(keyVaultUri))
 {
-    builder.Services.AddSingleton(new SecretClient(new Uri(keyVaultUri), new DefaultAzureCredential()));
+    var credential = new DefaultAzureCredential();
+    secretClient = new SecretClient(new Uri(keyVaultUri), credential);
+    builder.Services.AddSingleton(secretClient);
 }
+
+// Retrieve SQL connection string from Key Vault, falling back to appsettings
+string? sqlConnectionString = null;
+if (secretClient is not null)
+{
+    var secret = await secretClient.GetSecretAsync("SqlDatabase");
+    sqlConnectionString = secret.Value.Value;
+}
+sqlConnectionString ??= builder.Configuration.GetConnectionString("SqlDatabase");
 
 // Register EF Core with Azure SQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlDatabase")));
+    options.UseSqlServer(sqlConnectionString));
 builder.Services.AddScoped<IDatabaseHealthRepository, DatabaseHealthRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
