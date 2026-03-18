@@ -37,3 +37,5 @@ END
 | GET | `/api/database/employees` | Returns top 2 employees |
 | GET | `/api/database/employees/department/{department}` | Returns employees by department (stored procedure) |
 | GET | `/api/secrets/{secretName}` | Retrieves a secret from Azure Key Vault |
+
+
