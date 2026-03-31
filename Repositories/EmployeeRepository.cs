@@ -1,3 +1,5 @@
+using System.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Pima.Api.Data;
 using Pima.Api.Models;
@@ -27,9 +29,25 @@ public class EmployeeRepository : IEmployeeRepository
     /// <inheritdoc />
     public async Task<List<Employee>> GetByDepartmentAsync(string department)
     {
-        return await _context.Employees
-            .FromSqlInterpolated($"EXEC GetEmployeesByDepartment @Department = {department}")
+        var departmentParam = new SqlParameter("@Department", department);
+
+        var managerParam = new SqlParameter("@DepartmentManager", SqlDbType.NVarChar, 200)
+        {
+            Direction = ParameterDirection.Output
+        };
+
+        var salaryParam = new SqlParameter("@AverageSalary", SqlDbType.Float)
+        {
+            Direction = ParameterDirection.Output
+        };
+
+        var employees = await _context.Employees
+            .FromSqlRaw(
+                "EXEC GetEmployeesByDepartment @Department, @DepartmentManager OUTPUT, @AverageSalary OUTPUT",
+                departmentParam, managerParam, salaryParam)
             .ToListAsync();
+
+        return employees;
     }
 
     /// <inheritdoc />
