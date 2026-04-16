@@ -27,6 +27,12 @@ public class EmployeeRepository : IEmployeeRepository
     }
 
     /// <inheritdoc />
+    public async Task<List<Employee>> GetAllAsync()
+    {
+        return await _context.Employees.ToListAsync();
+    }
+
+    /// <inheritdoc />
     public async Task<List<Employee>> GetByDepartmentAsync(string department)
     {
         var departmentParam = new SqlParameter("@Department", department);
@@ -56,5 +62,29 @@ public class EmployeeRepository : IEmployeeRepository
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync();
         return employee;
+    }
+
+    /// <inheritdoc />
+    public async Task<Employee?> UpdateLastNameAsync(int id, string lastName)
+    {
+        var employee = await _context.Employees.FindAsync(id);
+        if (employee == null)
+            return null;
+
+        employee.LastName = lastName;
+        await _context.SaveChangesAsync();
+        return employee;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var employee = await _context.Employees.FindAsync(id);
+        if (employee == null)
+            return false;
+
+        _context.Employees.Remove(employee);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

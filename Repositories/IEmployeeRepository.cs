@@ -13,6 +13,11 @@ public interface IEmployeeRepository
     Task<List<Employee>> GetTopAsync(int count);
 
     /// <summary>
+    /// Returns all employees.
+    /// </summary>
+    Task<List<Employee>> GetAllAsync();
+
+    /// <summary>
     /// Returns employees in the given department via stored procedure.
     /// </summary>
     Task<List<Employee>> GetByDepartmentAsync(string department);
@@ -21,4 +26,14 @@ public interface IEmployeeRepository
     /// Adds a new employee and returns the created entity.
     /// </summary>
     Task<Employee> AddAsync(Employee employee);
+
+    /// <summary>
+    /// Updates the last name of an employee by ID.
+    /// </summary>
+    Task<Employee?> UpdateLastNameAsync(int id, string lastName);
+
+    /// <summary>
+    /// Deletes an employee by ID. Returns true if found and deleted.
+    /// </summary>
+    Task<bool> DeleteAsync(int id);
 }

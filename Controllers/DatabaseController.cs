@@ -56,6 +56,17 @@ public class DatabaseController : ControllerBase
     }
 
     /// <summary>
+    /// Returns all employees.
+    /// </summary>
+    [HttpGet("employees/all")]
+    [ProducesResponseType(typeof(List<Employee>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllEmployees()
+    {
+        var employees = await _employeeRepo.GetAllAsync();
+        return Ok(employees);
+    }
+
+    /// <summary>
     /// Returns employees in a given department via stored procedure.
     /// </summary>
     [HttpGet("employees/department/{department}")]
@@ -76,6 +87,36 @@ public class DatabaseController : ControllerBase
         employee.CreatedAt = DateTime.UtcNow;
         var created = await _employeeRepo.AddAsync(employee);
         return CreatedAtAction(nameof(GetEmployees), created);
+    }
+
+    /// <summary>
+    /// Updates the last name of an employee.
+    /// </summary>
+    [HttpPatch("employees/{id}/lastname")]
+    [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateEmployeeName(int id, [FromBody] string lastName)
+    {
+        var employee = await _employeeRepo.UpdateLastNameAsync(id, lastName);
+        if (employee == null)
+            return NotFound();
+
+        return Ok(employee);
+    }
+
+    /// <summary>
+    /// Deletes an employee by ID.
+    /// </summary>
+    [HttpDelete("employees/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteEmployee(int id)
+    {
+        var deleted = await _employeeRepo.DeleteAsync(id);
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
     }
 }
 
